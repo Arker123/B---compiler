@@ -7,21 +7,29 @@ int yylex();
 
 %}
 
-%token ID STATEMENT
+%union {
+	char* string;
+}
+
+%token <string>ID 
+%token STATEMENT
 
 
 %%
 
-commands: index statement content;
-index: ID {printf("ID: %d", $1);}
+commands: index;
+index: ID {printf("ID: %s\n", $1);}
+
+
+%%
+/*
 statement: STATEMENT {printf("Statement: %d", $1); if ($1 == 1) printf("REM Statement");}
 content: ;
 
-
-%%
-
+*/
 void yyerror(const char* message)
 {
+	// printf("%s", ID);
 	printf("ERROR : %s", message);
 }
 
