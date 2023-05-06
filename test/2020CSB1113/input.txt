@@ -1,7 +1,0 @@
-// hello world;
-// i'm alive;
-int am(){
-
-}
-
-// Hurray
