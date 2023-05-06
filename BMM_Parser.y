@@ -22,6 +22,8 @@
 %token IF THEN IFNUM IFVAR
 %token INPUT INPUTTOKEN
 %token REM
+%token FOR NEXT TO STEP
+%token DEF FN
 
 
 %left '+' '-'
@@ -50,11 +52,18 @@ statement: print_statement
          | if_statement
          | input_statement
          | rem_statement
+         | for_statement
+         | def_statement
          ;
+
+def_statement: ID DEF def_declaration
+             ;
 
 rem_statement: ID REM {printf("REMM\n");}
              ;
 
+for_statement: ID FOR for_declaration statement_list NEXT VAR
+             ;
 
 let_statement: ID LET declaration
              ;
@@ -149,6 +158,14 @@ dim_declaration: dim_expr
                 ;
 dim_expr: DIMDATA {printf("DIM Data\n");}
         ;
+
+for_declaration: VAR '=' expr TO expr
+                | VAR '=' expr TO expr STEP expr
+                ;
+
+def_declaration: FN '=' expr
+            | FN '(' VAR ')' '=' expr 
+
 
 %%
 
