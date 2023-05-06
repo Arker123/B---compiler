@@ -77,7 +77,13 @@ extern int yydebug;
     IFVAR = 278,                   /* IFVAR  */
     INPUT = 279,                   /* INPUT  */
     INPUTTOKEN = 280,              /* INPUTTOKEN  */
-    REM = 281                      /* REM  */
+    REM = 281,                     /* REM  */
+    FOR = 282,                     /* FOR  */
+    NEXT = 283,                    /* NEXT  */
+    TO = 284,                      /* TO  */
+    STEP = 285,                    /* STEP  */
+    DEF = 286,                     /* DEF  */
+    FN = 287                       /* FN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -110,6 +116,12 @@ extern int yydebug;
 #define INPUT 279
 #define INPUTTOKEN 280
 #define REM 281
+#define FOR 282
+#define NEXT 283
+#define TO 284
+#define STEP 285
+#define DEF 286
+#define FN 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

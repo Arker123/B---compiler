@@ -33,13 +33,17 @@ digit [0-9]
 %x iff
 %x inputt
 %x remm
+%x forr_nextt
+%x deff
 
-/* Left--> FOR, NEXT, DEF, variable type error */
+/* Left--> DEF, variable type error */
 
 %%
 
 [0-9][0-9]{0,3} {yylval=atoi(yytext); return ID;}
 "PRINT" {BEGIN(expression); return PRINT;}
+"DEF" {BEGIN(deff); return DEF;}
+"FOR" {BEGIN(forr_nextt); return FOR;}
 "LET" {BEGIN(expression); return LET;}
 "DATA" {BEGIN(value); return DATA;}
 "DIM" {BEGIN(dim); return DIM;}
@@ -109,6 +113,32 @@ digit [0-9]
 <remm>[^\n]* {}
 <remm>(\n) {BEGIN(0);}
 
+<forr_nextt>STEP {return STEP;/*STEP detected*/}
+<forr_nextt>TO {return TO;/*TO detected*/}
+
+<forr_nextt>[0-9]+ {return NUM;}
+<forr_nextt>(\+|\-|\*|\/) {return yytext[0];}
+<forr_nextt>(\(|\{|\[) {return yytext[0];}
+<forr_nextt>(\)|\}|\]) {return yytext[0];}
+<forr_nextt>(\=|\<|\>|\>\=|\<\=|\<\>) {return yytext[0];}
+
+<forr_nextt>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
+<forr_nextt>[/NEXT/][ ][A-Z][0-9]?(%|!|#|\$)? {BEGIN(0); return NEXT;/*NEXT detected*/}
+<forr_nextt>[ ] {/*space detected*/}
+<forr_nextt>(\n) {}
+
+
+<deff>FN[A-Z] {return FN;}
+<deff>[\(\)] {return yytext[0];}
+<deff>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
+<deff>[0-9]+ {return NUM;}
+<deff>(\+|\-|\*|\/) {return yytext[0];}
+<deff>(\(|\{|\[) {return yytext[0];}
+<deff>(\)|\}|\]) {return yytext[0];}
+<deff>(\=) {return yytext[0];}
+<deff>[ ]
+
+<deff>(\n) {BEGIN(0);}
 
 %%
 
