@@ -10,7 +10,6 @@ yacc:
 gcc:
 	gcc lex.yy.c y.tab.c -lfl
  
-
 counter:
 	yacc -d BMM_Parser.y -Wcounterexamples
 
