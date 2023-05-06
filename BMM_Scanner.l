@@ -27,6 +27,11 @@ digit [0-9]
 
 %x expression
 %x value
+%x dim
+%x gotoo
+%x gosub
+
+/* Left--> STOP, RETURN, REM, IF, FOR, NEXT, INPUT, 
 
 %%
 
@@ -34,6 +39,9 @@ digit [0-9]
 "PRINT" {BEGIN(expression); return PRINT;}
 "LET" {BEGIN(expression); return LET;}
 "DATA" {BEGIN(value); return DATA;}
+"DIM" {BEGIN(dim); return DIM;}
+"GOTO" {BEGIN(gotoo); return GOTO;}
+"GOSUB" {BEGIN(gosub); return GOSUB;}
 "END" {return END;}
 [ \t] {;}
 [\n]  { countn++; }
@@ -50,9 +58,26 @@ digit [0-9]
 
 <expression>(\=|\<|\>|\>\=|\<\=|\<\>) {return yytext[0];}
 
+<expression>[ ]
+
 
 <value>(\n) {BEGIN(0);}
+<value>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {return FLOAT;}
+<value>\".*\" {return STRING;}
+<value>[ \,]
 
+
+<dim>(\n) {BEGIN(0);}
+<dim>[A-Z]\([0-9]+\ *(,\ *[0-9]+)?\) {return DIMDATA;}
+<dim>[ \,]
+
+<gotoo>(\n) {BEGIN(0);}
+<gotoo>[0-9]+ {return GOTOID;}
+<gotoo>[ ]
+
+<gosub>(\n) {BEGIN(0);}
+<gosub>[0-9]+ {return GOSUBID;}
+<gosub>[ ]
 
 %%
 

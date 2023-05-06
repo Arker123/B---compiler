@@ -14,6 +14,11 @@
 
 %token ID PRINT LET END
 %token VAR NUM
+%token DATA FLOAT STRING
+%token DIM DIMDATA
+%token GOTO GOTOID
+%token GOSUB GOSUBID
+
 
 %left '+' '-'
 %left '*' '/'
@@ -32,12 +37,28 @@ statement_list: statement
 statement: print_statement
          | let_statement
          | end_statement
+         | data_statement
+         | dim_statement
+         | goto_statement
+         | gosub_statement
          ;
 
 let_statement: ID LET declaration
              ;
 
 print_statement: ID PRINT declaration
+               ;
+
+data_statement: ID DATA data_declaration
+              ;
+
+dim_statement: ID DIM dim_declaration
+             ;
+
+goto_statement: ID GOTO GOTOID {printf("GOTOO\n");}
+              ;
+
+gosub_statement: ID GOSUB GOSUBID {printf("GOSUBB\n");}
                ;
 
 end_statement: END {printf("ENDD\n");return 0;}
@@ -64,7 +85,18 @@ expr: VAR {printf("Variable\n");}
     | '{' expr '}' {printf("Braces\n");}
     ;
 
+data_declaration: data_expr
+                 | data_declaration data_expr
+                 ;
+data_expr: STRING {printf("String\n");}
+         | FLOAT {printf("Float\n");}
+         ;
 
+dim_declaration: dim_expr
+                | dim_declaration dim_expr
+                ;
+dim_expr: DIMDATA {printf("DIM Data\n");}
+        ;
 
 %%
 
