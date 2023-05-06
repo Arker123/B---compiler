@@ -58,32 +58,36 @@ extern int yydebug;
     PRINT = 259,                   /* PRINT  */
     LET = 260,                     /* LET  */
     END = 261,                     /* END  */
-    VAR = 262,                     /* VAR  */
-    NUM = 263,                     /* NUM  */
-    DATA = 264,                    /* DATA  */
-    FLOAT = 265,                   /* FLOAT  */
-    STRING = 266,                  /* STRING  */
-    DIM = 267,                     /* DIM  */
-    DIMDATA = 268,                 /* DIMDATA  */
-    GOTO = 269,                    /* GOTO  */
-    GOTOID = 270,                  /* GOTOID  */
-    GOSUB = 271,                   /* GOSUB  */
-    GOSUBID = 272,                 /* GOSUBID  */
-    STOP = 273,                    /* STOP  */
-    RETURN = 274,                  /* RETURN  */
-    IF = 275,                      /* IF  */
-    THEN = 276,                    /* THEN  */
-    IFNUM = 277,                   /* IFNUM  */
-    IFVAR = 278,                   /* IFVAR  */
-    INPUT = 279,                   /* INPUT  */
-    INPUTTOKEN = 280,              /* INPUTTOKEN  */
-    REM = 281,                     /* REM  */
-    FOR = 282,                     /* FOR  */
-    NEXT = 283,                    /* NEXT  */
-    TO = 284,                      /* TO  */
-    STEP = 285,                    /* STEP  */
-    DEF = 286,                     /* DEF  */
-    FN = 287                       /* FN  */
+    NOT = 262,                     /* NOT  */
+    OR = 263,                      /* OR  */
+    XOR = 264,                     /* XOR  */
+    AND = 265,                     /* AND  */
+    VAR = 266,                     /* VAR  */
+    NUM = 267,                     /* NUM  */
+    DATA = 268,                    /* DATA  */
+    FLOAT = 269,                   /* FLOAT  */
+    STRING = 270,                  /* STRING  */
+    DIM = 271,                     /* DIM  */
+    DIMDATA = 272,                 /* DIMDATA  */
+    GOTO = 273,                    /* GOTO  */
+    GOTOID = 274,                  /* GOTOID  */
+    GOSUB = 275,                   /* GOSUB  */
+    GOSUBID = 276,                 /* GOSUBID  */
+    RETURN = 277,                  /* RETURN  */
+    STOP = 278,                    /* STOP  */
+    IF = 279,                      /* IF  */
+    THEN = 280,                    /* THEN  */
+    IFNUM = 281,                   /* IFNUM  */
+    IFVAR = 282,                   /* IFVAR  */
+    INPUT = 283,                   /* INPUT  */
+    INPUTTOKEN = 284,              /* INPUTTOKEN  */
+    REM = 285,                     /* REM  */
+    FOR = 286,                     /* FOR  */
+    NEXT = 287,                    /* NEXT  */
+    TO = 288,                      /* TO  */
+    STEP = 289,                    /* STEP  */
+    DEF = 290,                     /* DEF  */
+    FN = 291                       /* FN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -96,32 +100,36 @@ extern int yydebug;
 #define PRINT 259
 #define LET 260
 #define END 261
-#define VAR 262
-#define NUM 263
-#define DATA 264
-#define FLOAT 265
-#define STRING 266
-#define DIM 267
-#define DIMDATA 268
-#define GOTO 269
-#define GOTOID 270
-#define GOSUB 271
-#define GOSUBID 272
-#define STOP 273
-#define RETURN 274
-#define IF 275
-#define THEN 276
-#define IFNUM 277
-#define IFVAR 278
-#define INPUT 279
-#define INPUTTOKEN 280
-#define REM 281
-#define FOR 282
-#define NEXT 283
-#define TO 284
-#define STEP 285
-#define DEF 286
-#define FN 287
+#define NOT 262
+#define OR 263
+#define XOR 264
+#define AND 265
+#define VAR 266
+#define NUM 267
+#define DATA 268
+#define FLOAT 269
+#define STRING 270
+#define DIM 271
+#define DIMDATA 272
+#define GOTO 273
+#define GOTOID 274
+#define GOSUB 275
+#define GOSUBID 276
+#define RETURN 277
+#define STOP 278
+#define IF 279
+#define THEN 280
+#define IFNUM 281
+#define IFVAR 282
+#define INPUT 283
+#define INPUTTOKEN 284
+#define REM 285
+#define FOR 286
+#define NEXT 287
+#define TO 288
+#define STEP 289
+#define DEF 290
+#define FN 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
