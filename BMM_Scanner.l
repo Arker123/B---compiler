@@ -5,8 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "y.tab.h"
-// extern int yylval;
+extern int yylval;
 void yyerror(const char* message);
+
+int countn=0;
 
 
 int foo(long long yyleng, char *yytext);
@@ -17,10 +19,41 @@ void PRINTStatement(char* yytext, long long yyleng);
 /* Remaining --> DATA?, DEF, DIM, FOR, GOTO, GOSUB, IF, INPUT */
 /* REM -> 0*/
 /* STOP -> 1*/
+
+%option yylineno
+
+alpha [a-zA-Z]
+digit [0-9]
+
+%x expression
+%x value
+
 %%
-[0-9][0-9]{0,3}[ ]*REM(.)*(\n) {printf("REMM STATEMENT HERE\n");yylval.string = strdup(yytext);return ID;}
-[0-9][0-9]{0,3}[ ]*LET[ ]*.*(\n) {printf("LET Statement Found\n%s", yytext); return STATEMENT;}
-[\t \n] {printf("Somethings Wrong here hmm");}
+
+[0-9][0-9]{0,3} {yylval=atoi(yytext); return ID;}
+"PRINT" {BEGIN(expression); return PRINT;}
+"LET" {BEGIN(expression); return LET;}
+"DATA" {BEGIN(value); return DATA;}
+"END" {return END;}
+[ \t] {;}
+[\n]  { countn++; }
+
+
+<expression>(\n) {BEGIN(0);}
+<expression>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
+
+<expression>[0-9]+ {return NUM;}
+<expression>(\+|\-|\*|\/) {return yytext[0];}
+
+<expression>(\(|\{|\[) {return yytext[0];}
+<expression>(\)|\}|\]) {return yytext[0];}
+
+<expression>(\=|\<|\>|\>\=|\<\=|\<\>) {return yytext[0];}
+
+
+<value>(\n) {BEGIN(0);}
+
+
 %%
 
 

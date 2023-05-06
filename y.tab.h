@@ -55,7 +55,11 @@ extern int yydebug;
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
     ID = 258,                      /* ID  */
-    STATEMENT = 259                /* STATEMENT  */
+    PRINT = 259,                   /* PRINT  */
+    LET = 260,                     /* LET  */
+    END = 261,                     /* END  */
+    VAR = 262,                     /* VAR  */
+    NUM = 263                      /* NUM  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -65,20 +69,15 @@ extern int yydebug;
 #define YYerror 256
 #define YYUNDEF 257
 #define ID 258
-#define STATEMENT 259
+#define PRINT 259
+#define LET 260
+#define END 261
+#define VAR 262
+#define NUM 263
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
-{
-#line 10 "BMM_Parser.y"
-
-	char* string;
-
-#line 79 "y.tab.h"
-
-};
-typedef union YYSTYPE YYSTYPE;
+typedef int YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
