@@ -30,8 +30,11 @@ digit [0-9]
 %x dim
 %x gotoo
 %x gosub
+%x iff
+%x inputt
+%x remm
 
-/* Left--> STOP, RETURN, REM, IF, FOR, NEXT, INPUT, 
+/* Left--> FOR, NEXT, DEF, variable type error */
 
 %%
 
@@ -42,6 +45,11 @@ digit [0-9]
 "DIM" {BEGIN(dim); return DIM;}
 "GOTO" {BEGIN(gotoo); return GOTO;}
 "GOSUB" {BEGIN(gosub); return GOSUB;}
+"IF" {BEGIN(iff); return IF;}
+"INPUT" {BEGIN(inputt); return INPUT;}
+"REM" { BEGIN(remm); return REM; }
+"STOP" {return STOP;}
+"RETURN" {return RETURN;}
 "END" {return END;}
 [ \t] {;}
 [\n]  { countn++; }
@@ -78,6 +86,29 @@ digit [0-9]
 <gosub>(\n) {BEGIN(0);}
 <gosub>[0-9]+ {return GOSUBID;}
 <gosub>[ ]
+
+<iff>(\n) {BEGIN(0);}
+
+<iff>[A-Z][0-9]?(%|!|#|\$)? {return IFVAR;}
+<iff>[0-9]+ {return IFNUM;}
+
+<iff>(\+|\-|\*|\/) {return yytext[0];}
+<iff>(\(|\{|\[) {return yytext[0];}
+<iff>(\)|\}|\]) {return yytext[0];}
+<iff>(\=|\<|\>|\>\=|\<\=|\<\>) {return yytext[0];}
+
+<iff>THEN {return THEN;}
+
+<iff>[ ]
+
+<inputt>(\n) {BEGIN(0);}
+<inputt>[A-Z][0-9]?(%|!|#|\$)? {return INPUTTOKEN;}
+<inputt>[A-Z]\([0-9]+\ *(,\ *[0-9]+)?\) {return INPUTTOKEN;}
+<inputt>[ \,] {}
+
+<remm>[^\n]* {}
+<remm>(\n) {BEGIN(0);}
+
 
 %%
 

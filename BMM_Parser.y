@@ -18,6 +18,10 @@
 %token DIM DIMDATA
 %token GOTO GOTOID
 %token GOSUB GOSUBID
+%token STOP RETURN
+%token IF THEN IFNUM IFVAR
+%token INPUT INPUTTOKEN
+%token REM
 
 
 %left '+' '-'
@@ -41,12 +45,24 @@ statement: print_statement
          | dim_statement
          | goto_statement
          | gosub_statement
+         | stop_statement
+         | return_statement
+         | if_statement
+         | input_statement
+         | rem_statement
          ;
+
+rem_statement: ID REM {printf("REMM\n");}
+             ;
+
 
 let_statement: ID LET declaration
              ;
 
 print_statement: ID PRINT declaration
+               ;
+
+input_statement: ID INPUT input_declaration
                ;
 
 data_statement: ID DATA data_declaration
@@ -60,6 +76,14 @@ goto_statement: ID GOTO GOTOID {printf("GOTOO\n");}
 
 gosub_statement: ID GOSUB GOSUBID {printf("GOSUBB\n");}
                ;
+
+if_statement: ID IF if_declaration THEN IFNUM
+
+stop_statement: ID STOP {printf("STOPP\n");}
+                ;
+
+return_statement: ID RETURN {printf("RETURNN\n");}
+                 ;
 
 end_statement: END {printf("ENDD\n");return 0;}
 
@@ -84,6 +108,34 @@ expr: VAR {printf("Variable\n");}
     | '[' expr ']' {printf("Brackets\n");}
     | '{' expr '}' {printf("Braces\n");}
     ;
+
+if_declaration: if_expr'='if_expr
+                | if_expr'<''='if_expr
+                | if_expr'>''='if_expr
+                | if_expr'<'if_expr
+                | if_expr'>'if_expr
+                | if_expr'<''>'if_expr
+                | if_expr
+                ; 
+
+if_expr: IFVAR {printf("Variable\n");}
+         | IFNUM {printf("Number\n");}
+    
+         | if_expr '+' if_expr {printf("Addition\n");}
+         | if_expr '-' if_expr {printf("Subtraction\n");}
+         | if_expr '*' if_expr {printf("Multiplication\n");}
+         | if_expr '/' if_expr {printf("Division\n");}
+    
+         | '(' if_expr ')' {printf("Parenthesis\n");}
+         | '[' if_expr ']' {printf("Brackets\n");}
+         | '{' if_expr '}' {printf("Braces\n");}
+         ;
+
+input_declaration: input_expr
+                 | input_declaration input_expr
+                 ;
+
+input_expr: INPUTTOKEN {printf("Input\n");}
 
 data_declaration: data_expr
                  | data_declaration data_expr

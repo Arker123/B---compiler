@@ -68,7 +68,16 @@ extern int yydebug;
     GOTO = 269,                    /* GOTO  */
     GOTOID = 270,                  /* GOTOID  */
     GOSUB = 271,                   /* GOSUB  */
-    GOSUBID = 272                  /* GOSUBID  */
+    GOSUBID = 272,                 /* GOSUBID  */
+    STOP = 273,                    /* STOP  */
+    RETURN = 274,                  /* RETURN  */
+    IF = 275,                      /* IF  */
+    THEN = 276,                    /* THEN  */
+    IFNUM = 277,                   /* IFNUM  */
+    IFVAR = 278,                   /* IFVAR  */
+    INPUT = 279,                   /* INPUT  */
+    INPUTTOKEN = 280,              /* INPUTTOKEN  */
+    REM = 281                      /* REM  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -92,6 +101,15 @@ extern int yydebug;
 #define GOTOID 270
 #define GOSUB 271
 #define GOSUBID 272
+#define STOP 273
+#define RETURN 274
+#define IF 275
+#define THEN 276
+#define IFNUM 277
+#define IFVAR 278
+#define INPUT 279
+#define INPUTTOKEN 280
+#define REM 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
