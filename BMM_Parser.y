@@ -9,6 +9,7 @@
     extern int yylex();
     extern int yylineno;
     extern FILE* yyin;
+    extern FILE* yyout;
     extern char *yytext;
 %}
 
@@ -19,7 +20,7 @@
 %token GOTO GOTOID
 %token GOSUB GOSUBID RETURN
 %token STOP
-%token IF THEN IFNUM IFVAR
+%token IF THEN IFNUM IFVAR IFSTRINGVAR IFSTRING
 %token INPUT INPUTTOKEN
 %token REM
 %token FOR NEXT TO STEP
@@ -29,6 +30,7 @@
 %left '+' '-'
 %left '*' '/'
 %left NOT AND OR XOR
+%right '^'
 
 %start program
 
@@ -59,7 +61,7 @@ statement: print_statement
 def_statement: ID DEF def_declaration
              ;
 
-rem_statement: ID REM {printf("REMM\n");}
+rem_statement: ID REM 
              ;
 
 for_statement: ID FOR for_declaration statement_list for_next
@@ -73,7 +75,6 @@ let_statement: ID LET declaration
              ;
 
 print_statement: ID PRINT print_declaration 
-               | ID PRINT
                ;
 
 input_statement: ID INPUT input_declaration
@@ -85,48 +86,53 @@ data_statement: ID DATA data_declaration
 dim_statement: ID DIM dim_declaration
              ;
 
-goto_statement: ID GOTO GOTOID {printf("GOTOO\n");}
+goto_statement: ID GOTO GOTOID
               ;
 
-gosub_statement: ID GOSUB GOSUBID statement_list return_statement {printf("GOSUBB\n");}
-                | ID GOSUB GOSUBID return_statement {printf("GOSUBB without statements\n");}
+gosub_statement: ID GOSUB GOSUBID statement_list return_statement
+                | ID GOSUB GOSUBID return_statement 
                ;
 
 if_statement: ID IF if_declaration THEN IFNUM
 
-stop_statement: ID STOP {printf("STOPP\n");}
+stop_statement: ID STOP 
                 ;
 
-return_statement: ID RETURN {printf("RETURNN\n");}
+return_statement: ID RETURN
                  ;
 
-end_statement: ID END {printf("ENDD\n");}
+end_statement: ID END {}
 
-declaration: expr'='expr 
-            | expr'<''='expr 
-            | expr'>''='expr 
-            | expr'<'expr 
-            | expr'>'expr 
-            | expr'<''>'expr 
-            | expr 
+declaration:  NOT expr2
+            | expr2 AND expr2 
+            | expr2 OR expr2 
+            | expr2 XOR expr2
+            | expr2 
             ;
 
-expr: VAR {printf("Variable\n");}
-    | NUM {printf("Number\n");}
+expr2: expr'='expr 
+        | expr'<''='expr 
+        | expr'>''='expr 
+        | expr'<'expr 
+        | expr'>'expr 
+        | expr'<''>'expr
+        | expr
+        ;
+expr: VAR
+    | NUM
     
-    | NOT expr {printf("NOT\n");}
-    | expr AND expr {printf("AND\n");}
-    | expr OR expr {printf("OR\n");}
-    | expr XOR expr {printf("XOR\n");}
+    
 
-    | expr '+' expr {printf("Addition\n");}
-    | expr '-' expr {printf("Subtraction\n");}
-    | expr '*' expr {printf("Multiplication\n");}
-    | expr '/' expr {printf("Division\n");}
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr 
+    | expr '/' expr 
+    | expr '^' expr
+    | '-' expr 
 
-    | '(' expr ')' {printf("Parenthesis\n");}
-    | '[' expr ']' {printf("Brackets\n");}
-    | '{' expr '}' {printf("Braces\n");}
+    | '(' expr ')'
+    | '[' expr ']'
+    | '{' expr '}'
     ;
 
 if_declaration: if_expr'='if_expr
@@ -136,43 +142,51 @@ if_declaration: if_expr'='if_expr
                 | if_expr'>'if_expr
                 | if_expr'<''>'if_expr
                 | if_expr
+                | IFSTRINGVAR '=' IFSTRING 
+                | IFSTRINGVAR '<''>' IFSTRING
+                | IFSTRING '=' IFSTRING 
+                | IFSTRING '<''>' IFSTRING
+                | IFSTRINGVAR '=' IFSTRINGVAR 
+                | IFSTRINGVAR '<''>' IFSTRINGVAR
+                | IFSTRING '=' IFSTRINGVAR 
+                | IFSTRING '<''>' IFSTRINGVAR 
                 ; 
 
-if_expr: IFVAR {printf("Variable\n");}
-         | IFNUM {printf("Number\n");}
+if_expr: IFVAR 
+         | IFNUM 
     
-         | if_expr '+' if_expr {printf("Addition\n");}
-         | if_expr '-' if_expr {printf("Subtraction\n");}
-         | if_expr '*' if_expr {printf("Multiplication\n");}
-         | if_expr '/' if_expr {printf("Division\n");}
+         | if_expr '+' if_expr
+         | if_expr '-' if_expr
+         | if_expr '*' if_expr
+         | if_expr '/' if_expr
     
-         | '(' if_expr ')' {printf("Parenthesis\n");}
-         | '[' if_expr ']' {printf("Brackets\n");}
-         | '{' if_expr '}' {printf("Braces\n");}
+         | '(' if_expr ')'
+         | '[' if_expr ']' 
+         | '{' if_expr '}'
 
-         | NOT if_expr {printf("NOT\n");}
-         | if_expr AND if_expr {printf("AND\n");}
-         | if_expr OR if_expr {printf("OR\n");}
-         | if_expr XOR if_expr {printf("XOR\n");}
+         | NOT if_expr
+         | if_expr AND if_expr
+         | if_expr OR if_expr 
+         | if_expr XOR if_expr 
          ;
 
 input_declaration: input_expr
                  | input_declaration input_expr
                  ;
 
-input_expr: INPUTTOKEN {printf("Input\n");}
+input_expr: INPUTTOKEN
 
 data_declaration: data_expr
                  | data_declaration data_expr
                  ;
-data_expr: STRING {printf("String\n");}
-         | FLOAT {printf("Float\n");}
+data_expr: STRING
+         | FLOAT
          ;
 
 dim_declaration: dim_expr
                 | dim_declaration dim_expr
                 ;
-dim_expr: DIMDATA {printf("DIM Data\n");}
+dim_expr: DIMDATA
         ;
 
 for_declaration: VAR '=' expr TO expr
@@ -184,14 +198,14 @@ def_declaration: FN '=' expr
 
 
 print_declaration: print_expr
-                  | print_declaration ';' 
+                  | print_declaration ';'
                   | print_declaration ',' print_expr
                   | print_declaration ';' print_expr
                   ;
 
 print_expr: declaration
-            | STRING {printf("String\n");}
-          ;
+            | STRING 
+            ;
 
 %%
 
@@ -199,9 +213,15 @@ void yyerror(const char *msg) {
     printf("Error: %s at line %d: %s\n", msg, yylineno, yytext);
 }
 
-int main() {
-    yyin = fopen("./test.bmm", "r");
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Usage: ./a.out <filename>\n");
+        exit(1);
+    }
+    yyin = fopen(argv[1], "r");
+    yyout = fopen("output.txt", "w");
     yyparse();
     fclose(yyin);
+    fclose(yyout);
     return 0;
 }

@@ -1,0 +1,153 @@
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+DIM Statement found!
+Identifier: A(19) 
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+LET Statement found!
+Identifier: N 
+------------------------------------------------------
+GOSUB Statement found!
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+PRINT Statement found!
+------------------------------------------------------
+INPUT Statement found!
+Identifier: X
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+GOSUB Statement found!
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+IF Statement found!
+Identifier: F 
+------------------------------------------------------
+PRINT Statement found!
+Identifier: X 
+------------------------------------------------------
+GOTO Statement found!
+Line to GOTO: 270
+------------------------------------------------------
+PRINT Statement found!
+Identifier: X 
+Identifier: I 
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+PRINT Statement found!
+------------------------------------------------------
+INPUT Statement found!
+Identifier: A$
+------------------------------------------------------
+IF Statement found!
+Identifier: A$ 
+------------------------------------------------------
+IF Statement found!
+Identifier: A$ 
+------------------------------------------------------
+PRINT Statement found!
+------------------------------------------------------
+GOTO Statement found!
+Line to GOTO: 280
+------------------------------------------------------
+STOP Statement found!
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+FOR Statement found!
+Identifier: I 
+Identifier: N 
+------------------------------------------------------
+INPUT Statement found!
+Identifier: A(I)
+------------------------------------------------------
+NEXT Statement found!
+Identifier: I 
+------------------------------------------------------
+RETURN Statement found!
+ERROR: RETURN STATEMENT AND GOSUB DO NOT MATCH, EXITING 
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+LET Statement found!
+Identifier: F 
+------------------------------------------------------
+FOR Statement found!
+Identifier: I 
+Identifier: N 
+------------------------------------------------------
+IF Statement found!
+Identifier: A(I) 
+Identifier: X 
+------------------------------------------------------
+LET Statement found!
+Identifier: F 
+------------------------------------------------------
+GOTO Statement found!
+Line to GOTO: 600
+------------------------------------------------------
+NEXT Statement found!
+Identifier: I 
+------------------------------------------------------
+RETURN Statement found!
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+DATA Statement found!
+------------------------------------------------------
+REM Statement found! Comment
+------------------------------------------------------
+END Statement found!
+Program Checked Successfully!!!

@@ -7,7 +7,8 @@
 #include "y.tab.h"
 extern int yylval;
 extern void yyerror(const char* message);
-int count=0;
+int forCounter=0;
+int gosubCounter=0;
 int endCounter = 0;
 void yyerror(const char* message);
 
@@ -49,33 +50,58 @@ digit [0-9]
 "AND" {return AND;}
 "OR" {return OR;}
 "XOR" {return XOR;}
-"PRINT" {BEGIN(expression); return PRINT;}
-"DEF" {BEGIN(deff); return DEF;}
-"FOR" {BEGIN(forr); return FOR;}
-"NEXT" {BEGIN(nextt); return NEXT;}
-"LET" {BEGIN(expression); return LET;}
-"DATA" {BEGIN(value); return DATA;}
-"DIM" {BEGIN(dim); return DIM;}
-"GOTO" {BEGIN(gotoo); return GOTO;}
-"GOSUB" {BEGIN(gosub); return GOSUB;}
-"IF" {BEGIN(iff); return IF;}
-"INPUT" {BEGIN(inputt); return INPUT;}
-"REM" { BEGIN(remm); return REM; }
-"STOP" {return STOP;}
-"RETURN" {return RETURN;}
-"END" {endCounter++;if(endCounter>1){yyerror("END OCCURED MORE THAN ONCE\n");} return END;}
-[ \t] {;}
-[\n]  { countn++; }
+"PRINT"     {BEGIN(expression); fprintf(yyout,"PRINT Statement found!\n"); return PRINT;}
+"DEF"       {BEGIN(deff); fprintf(yyout,"DEF Statement found!\n"); return DEF;}
+"FOR"       {forCounter++;BEGIN(forr); fprintf(yyout,"FOR Statement found!\n"); return FOR;}
+"NEXT"      {
+                forCounter--; 
+                BEGIN(nextt); 
+                fprintf(yyout,"NEXT Statement found!\n"); return NEXT;
+                if(forCounter%2!=0){
+                    fprintf(yyout,"ERROR: NEXT STATEMENT AND FOR DO NOT MATCH, EXITING\n");
+                }
+            }
+"LET"       {BEGIN(expression); fprintf(yyout,"LET Statement found!\n"); return LET;}
+"DATA"      {BEGIN(value); fprintf(yyout,"DATA Statement found!\n"); return DATA;}
+"DIM"       {BEGIN(dim); fprintf(yyout,"DIM Statement found!\n"); return DIM;}
+"GOTO"      {BEGIN(gotoo); fprintf(yyout,"GOTO Statement found!\n"); return GOTO;}
+"GOSUB"     {gosubCounter++;BEGIN(gosub); fprintf(yyout,"GOSUB Statement found!\n"); return GOSUB;}
+"IF"        {BEGIN(iff); fprintf(yyout,"IF Statement found!\n"); return IF;}
+"INPUT"     {BEGIN(inputt); fprintf(yyout,"INPUT Statement found!\n"); return INPUT;}
+"REM"       {BEGIN(remm); fprintf(yyout,"REM Statement found! Comment\n"); return REM; }
+"STOP"      {fprintf(yyout,"STOP Statement found!\n"); return STOP;}
+"RETURN"    {
+                gosubCounter--;
+                fprintf(yyout,"RETURN Statement found!\n");
+                if(gosubCounter%2!=0){
+                    fprintf(yyout,"ERROR: RETURN STATEMENT AND GOSUB DO NOT MATCH, EXITING \n");
+                } 
+                return RETURN;}
+"END"       {
+                fprintf(yyout,"END Statement found!\n"); 
+                endCounter++;
+                if(endCounter>1){
+                    yyerror("INVALID:END OCCURED MORE THAN ONCE\n");
+                    exit(0);
+                } 
+                return END;
+            }
+[ ] {;}
+[\t] {fprintf(yyout,"Syntax Error: Tabs are not allowed\n");}
+[\n]  { countn++; fprintf(yyout,"------------------------------------------------------\n");}
+<<EOF>> {fprintf(yyout,"Program Checked Successfully!!!\n");exit(0);}
 
-
-<expression>(\n) {BEGIN(0);}
-<expression>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
+<expression>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
+<expression>[A-Z][0-9]?(%|!|#|\$)? {fprintf(yyout,"Identifier: %s \n", yytext);return VAR;}
 <expression>\".*\" {return STRING;}
-<expression>[A-Z]\(\ *[0-9]+\ *(,\ *[0-9]+)?\) {return VAR;}
+<expression>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {fprintf(yyout,"Identifier: %s \n", yytext);return VAR;}
 <expression>[,;] {return yytext[0];}
 <expression>[0-9]+ {return NUM;}
-<expression>(\+|\-|\*|\/) {return yytext[0];}
-
+<expression>(\|\^|\+|\-|\*|\/) {return yytext[0];}
+<expression>AND {return AND;}
+<expression>OR {return OR;}
+<expression>XOR {return XOR;}
+<expression>NOT {return NOT;}
 <expression>(\(|\{|\[) {return yytext[0];}
 <expression>(\)|\}|\]) {return yytext[0];}
 
@@ -84,31 +110,33 @@ digit [0-9]
 <expression>[ ]
 
 
-<value>(\n) {BEGIN(0);}
+<value>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
 <value>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {return FLOAT;}
 <value>\".*\" {return STRING;}
 <value>[ \,]
 
 
-<dim>(\n) {BEGIN(0);}
-<dim>[A-Z]\(\ *[0-9]+\ *(,\ *[0-9]+)?\) {return DIMDATA;}
+<dim>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
+<dim>[A-Z]\(\ *[0-9]+\ *(,\ *[0-9]+)?\) {fprintf(yyout,"Identifier: %s \n", yytext);return DIMDATA;}
 <dim>[ \,]
 
-<gotoo>(\n) {BEGIN(0);}
-<gotoo>[0-9]+ {return GOTOID;}
+<gotoo>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
+<gotoo>[0-9]+ {fprintf(yyout,"Line to GOTO: %s\n", yytext);return GOTOID;}
 <gotoo>[ ]
 
-<gosub>(\n) {BEGIN(0);}
+<gosub>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
 <gosub>[0-9]+ {return GOSUBID;}
 <gosub>[ ]
 
-<iff>(\n) {BEGIN(0);}
+<iff>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
 
-<iff>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {return IFVAR;/*DIMDATA VARIABLE*/}
-<iff>[A-Z][0-9]?(%|!|#|\$)? {return IFVAR;}
+<iff>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {fprintf(yyout,"Identifier: %s \n", yytext);return IFVAR;/*DIMDATA VARIABLE*/}
+<iff>[A-Z][0-9]?(%|!|#)? {fprintf(yyout,"Identifier: %s \n", yytext);return IFVAR;}
+<iff>[A-Z][0-9]?(\$) {fprintf(yyout,"Identifier: %s \n", yytext);return IFSTRINGVAR;}
 <iff>[0-9]+ {return IFNUM;}
+<iff>\".*\" {return IFSTRING;}
 
-<iff>(\+|\-|\*|\/) {return yytext[0];}
+<iff>(\^|\+|\-|\*|\/) {return yytext[0];}
 <iff>(\(|\{|\[) {return yytext[0];}
 <iff>(\)|\}|\]) {return yytext[0];}
 <iff>(\=|\<|\>|\>\=|\<\=|\<\>) {return yytext[0];}
@@ -117,134 +145,89 @@ digit [0-9]
 
 <iff>[ ]
 
-<inputt>(\n) {BEGIN(0);}
-<inputt>[A-Z][0-9]?(%|!|#|\$)? {return INPUTTOKEN;}
-<inputt>[A-Z]\(\ *[0-9]+\ *(,\ *[0-9]+)?\) {return INPUTTOKEN;}
+<inputt>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
+<inputt>[A-Z][0-9]?(%|!|#|\$)? {fprintf(yyout,"Identifier: %s\n", yytext);return INPUTTOKEN;}
+<inputt>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {fprintf(yyout,"Identifier: %s\n", yytext);return INPUTTOKEN;}
 <inputt>[ \,] {}
 
 <remm>[^\n]* {}
-<remm>(\n) {BEGIN(0);}
+<remm>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
 
 <forr>STEP {return STEP;/*STEP detected*/}
 <forr>TO {return TO;/*TO detected*/}
 
 <forr>[0-9]+ {return NUM;}
-<forr>(\+|\-|\*|\/) {return yytext[0];}
+<forr>(\^|\+|\-|\*|\/) {return yytext[0];}
 <forr>(\(|\{|\[) {return yytext[0];}
 <forr>(\)|\}|\]) {return yytext[0];}
 <forr>(\=) {return yytext[0];}
 
-<forr>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {return VAR;}
-<forr>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
+<forr>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {fprintf(yyout,"Identifier: %s \n", yytext);return VAR;}
+<forr>[A-Z][0-9]?(%|!|#|\$)? {fprintf(yyout,"Identifier: %s \n", yytext);return VAR;}
 <forr>[ ] {/*space detected*/}
-<forr>(\n) {BEGIN(0);}
+<forr>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
 
 
 <nextt>[ ] {/*space detected*/}
-<nextt>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
-<nextt>(\n) {BEGIN(0);}
+<nextt>[A-Z][0-9]?(%|!|#|\$)? {fprintf(yyout,"Identifier: %s \n", yytext);return VAR;}
+<nextt>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {fprintf(yyout,"Identifier: %s \n", yytext);return VAR;}
+<nextt>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
 
 
 <deff>FN[A-Z] {return FN;}
 <deff>[\(\)] {return yytext[0];}
-<deff>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
+<deff>[A-Z][0-9]?(%|!|#|\$)? {fprintf(yyout,"Identifier: %s \n", yytext);return VAR;}
 <deff>[0-9]+ {return NUM;}
-<deff>(\+|\-|\*|\/) {return yytext[0];}
+<deff>(\^|\+|\-|\*|\/) {return yytext[0];}
 <deff>(\(|\{|\[) {return yytext[0];}
 <deff>(\)|\}|\]) {return yytext[0];}
 <deff>(\=) {return yytext[0];}
 <deff>[ ]
 
-<deff>(\n) {BEGIN(0);}
+<deff>(\n) {BEGIN(0);fprintf(yyout,"------------------------------------------------------\n");}
 
 %%
 
 
-/*
 
-10 LET I=10
-num
-let
-rem
-...
-expr
-
-10 LET I=1 
-
-10 REM DISPLAY ODD NUMBERS FROM 1 TO 9
-20 LET I=1
-30 PRINT I
-40 END
-
-[0-9][0-9]{0,3}[ ]*PRINT[ ]*.*(\n) {printf("PRINT Statement Found\n");}
-[0-9][0-9]{0,3}[ ]*END[ ]*(\n) {printf("END Statement found");}
-
-. {printf("yoo"); printf("Token: %s", yytext);} t
- yylval=atoi(yytext); return ID;
-
-[0-9][0-9]{0,3} {printf("Int\n"); yylval=atoi(yytext); return ID;}
-REM(.)*(\n)     {yylval = 1;return STATEMENT;}
-STOP[^\n]*     {yylval = 2;return STATEMENT;}
-END[^\n]*     {yylval = 3; return STATEMENT;}
-RETURN[^\n]*     {yylval = 4; return STATEMENT;}
-LET[\ ]+     {yylval = 5; return STATEMENT;}
-[A-Z][0-9]?(%|!|#|$)?[^\n]*     {yylval = 6; return ID;}
-*/
 int foo(long long yyleng, char *yytext)
 {
-    printf("yyleng: %lld\n", yyleng);
+    fprintf(yyout,"yyleng: %lld\n", yyleng);
     for (int i = 0; i < yyleng; i++)
     {
-        printf("%c", yytext[i]);
+        fprintf(yyout,"%c", yytext[i]);
     }
     return yyleng;
 }
 
 void LETStatement(char* yytext, long long yyleng)
 {
-    printf("LET statement found\n");
+    fprintf(yyout,"LET statement found\n");
     // Parse LET Statement and return the token
     char* token = strtok(yytext, " ");
     char* variable = strtok(NULL, " ");
     char* operator = strtok(NULL, "=");
     char* operand = strtok(NULL, " ");
-    printf("Token: %s\n", token);
-    printf("Variable: %s\n", variable);
-    printf("Operator: %s\n", operator);
-    printf("Operand: %s\n", operand);
+    fprintf(yyout,"Token: %s\n", token);
+    fprintf(yyout,"Variable: %s\n", variable);
+    fprintf(yyout,"Operator: %s\n", operator);
+    fprintf(yyout,"Operand: %s\n", operand);
 
 }
 
 void PRINTStatement(char* yytext, long long yyleng)
 {
-    printf("PRINT statement found\n");
+    fprintf(yyout,"PRINT statement found\n");
     // Parse PRINT Statement and return the token
     char* token = strtok(yytext, " ");
     char* variable = strtok(NULL, " ");
     char* operator = strtok(NULL, " ");
-    printf("Token: %s\n", token);
-    printf("Variable: %s\n", variable);
-    printf("Operator: %s\n", operator);
+    fprintf(yyout,"Token: %s\n", token);
+    fprintf(yyout,"Variable: %s\n", variable);
+    fprintf(yyout,"Operator: %s\n", operator);
 }
 
 int yywrap()
 {
     return 1;
 }
-
-// int main()
-// {
-//     while(1)
-//     {
-//         printf("%d", yylex());
-//     }
-// }
-// int main(int argc, char *argv[]) {
-    // yyin = fopen(argv[1], "r");
-    // yylex();
-    // fclose(yyin);
-    // printf("Number of characters : %d\n", characters);
-    // printf("Number of spaces : %d\n", spaces);
-    // printf("Number of words : %d\n", words);
-    // printf("Number of lines : %d\n", lines);
-// }
