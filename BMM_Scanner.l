@@ -6,6 +6,9 @@
 #include <string.h>
 #include "y.tab.h"
 extern int yylval;
+extern void yyerror(const char* message);
+int count=0;
+int endCounter = 0;
 void yyerror(const char* message);
 
 int countn=0;
@@ -33,17 +36,23 @@ digit [0-9]
 %x iff
 %x inputt
 %x remm
-%x forr_nextt
+%x forr
 %x deff
+%x nextt
 
-/* Left--> DEF, variable type error */
+/* Left--> variable type error, print error (I, negative consideration in NUM I=-1  */
 
 %%
 
 [0-9][0-9]{0,3} {yylval=atoi(yytext); return ID;}
+"NOT" {return NOT;}
+"AND" {return AND;}
+"OR" {return OR;}
+"XOR" {return XOR;}
 "PRINT" {BEGIN(expression); return PRINT;}
 "DEF" {BEGIN(deff); return DEF;}
-"FOR" {BEGIN(forr_nextt); return FOR;}
+"FOR" {BEGIN(forr); return FOR;}
+"NEXT" {BEGIN(nextt); return NEXT;}
 "LET" {BEGIN(expression); return LET;}
 "DATA" {BEGIN(value); return DATA;}
 "DIM" {BEGIN(dim); return DIM;}
@@ -54,14 +63,16 @@ digit [0-9]
 "REM" { BEGIN(remm); return REM; }
 "STOP" {return STOP;}
 "RETURN" {return RETURN;}
-"END" {return END;}
+"END" {endCounter++;if(endCounter>1){yyerror("END OCCURED MORE THAN ONCE\n");} return END;}
 [ \t] {;}
 [\n]  { countn++; }
 
 
 <expression>(\n) {BEGIN(0);}
 <expression>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
-
+<expression>\".*\" {return STRING;}
+<expression>[A-Z]\(\ *[0-9]+\ *(,\ *[0-9]+)?\) {return VAR;}
+<expression>[,;] {return yytext[0];}
 <expression>[0-9]+ {return NUM;}
 <expression>(\+|\-|\*|\/) {return yytext[0];}
 
@@ -80,7 +91,7 @@ digit [0-9]
 
 
 <dim>(\n) {BEGIN(0);}
-<dim>[A-Z]\([0-9]+\ *(,\ *[0-9]+)?\) {return DIMDATA;}
+<dim>[A-Z]\(\ *[0-9]+\ *(,\ *[0-9]+)?\) {return DIMDATA;}
 <dim>[ \,]
 
 <gotoo>(\n) {BEGIN(0);}
@@ -93,6 +104,7 @@ digit [0-9]
 
 <iff>(\n) {BEGIN(0);}
 
+<iff>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {return IFVAR;/*DIMDATA VARIABLE*/}
 <iff>[A-Z][0-9]?(%|!|#|\$)? {return IFVAR;}
 <iff>[0-9]+ {return IFNUM;}
 
@@ -107,25 +119,30 @@ digit [0-9]
 
 <inputt>(\n) {BEGIN(0);}
 <inputt>[A-Z][0-9]?(%|!|#|\$)? {return INPUTTOKEN;}
-<inputt>[A-Z]\([0-9]+\ *(,\ *[0-9]+)?\) {return INPUTTOKEN;}
+<inputt>[A-Z]\(\ *[0-9]+\ *(,\ *[0-9]+)?\) {return INPUTTOKEN;}
 <inputt>[ \,] {}
 
 <remm>[^\n]* {}
 <remm>(\n) {BEGIN(0);}
 
-<forr_nextt>STEP {return STEP;/*STEP detected*/}
-<forr_nextt>TO {return TO;/*TO detected*/}
+<forr>STEP {return STEP;/*STEP detected*/}
+<forr>TO {return TO;/*TO detected*/}
 
-<forr_nextt>[0-9]+ {return NUM;}
-<forr_nextt>(\+|\-|\*|\/) {return yytext[0];}
-<forr_nextt>(\(|\{|\[) {return yytext[0];}
-<forr_nextt>(\)|\}|\]) {return yytext[0];}
-<forr_nextt>(\=|\<|\>|\>\=|\<\=|\<\>) {return yytext[0];}
+<forr>[0-9]+ {return NUM;}
+<forr>(\+|\-|\*|\/) {return yytext[0];}
+<forr>(\(|\{|\[) {return yytext[0];}
+<forr>(\)|\}|\]) {return yytext[0];}
+<forr>(\=) {return yytext[0];}
 
-<forr_nextt>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
-<forr_nextt>[/NEXT/][ ][A-Z][0-9]?(%|!|#|\$)? {BEGIN(0); return NEXT;/*NEXT detected*/}
-<forr_nextt>[ ] {/*space detected*/}
-<forr_nextt>(\n) {}
+<forr>[A-Z]\(\ *[0-9a-zA-Z]+\ *(,\ *[0-9a-zA-Z]+)?\) {return VAR;}
+<forr>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
+<forr>[ ] {/*space detected*/}
+<forr>(\n) {BEGIN(0);}
+
+
+<nextt>[ ] {/*space detected*/}
+<nextt>[A-Z][0-9]?(%|!|#|\$)? {return VAR;}
+<nextt>(\n) {BEGIN(0);}
 
 
 <deff>FN[A-Z] {return FN;}

@@ -5,20 +5,20 @@
     #include<stdlib.h>
     #include<ctype.h>
     // #include"lex.yy.c"
-    
     void yyerror(const char *s);
     extern int yylex();
     extern int yylineno;
+    extern FILE* yyin;
     extern char *yytext;
 %}
 
 %token ID PRINT LET END
-%token VAR NUM
+%token NOT OR XOR AND VAR NUM
 %token DATA FLOAT STRING
 %token DIM DIMDATA
 %token GOTO GOTOID
-%token GOSUB GOSUBID
-%token STOP RETURN
+%token GOSUB GOSUBID RETURN
+%token STOP
 %token IF THEN IFNUM IFVAR
 %token INPUT INPUTTOKEN
 %token REM
@@ -28,6 +28,7 @@
 
 %left '+' '-'
 %left '*' '/'
+%left NOT AND OR XOR
 
 %start program
 
@@ -48,7 +49,6 @@ statement: print_statement
          | goto_statement
          | gosub_statement
          | stop_statement
-         | return_statement
          | if_statement
          | input_statement
          | rem_statement
@@ -62,13 +62,18 @@ def_statement: ID DEF def_declaration
 rem_statement: ID REM {printf("REMM\n");}
              ;
 
-for_statement: ID FOR for_declaration statement_list NEXT VAR
+for_statement: ID FOR for_declaration statement_list for_next
+            | ID FOR for_declaration for_next
              ;
+
+for_next: ID NEXT VAR
+            ;
 
 let_statement: ID LET declaration
              ;
 
-print_statement: ID PRINT declaration
+print_statement: ID PRINT print_declaration 
+               | ID PRINT
                ;
 
 input_statement: ID INPUT input_declaration
@@ -83,7 +88,8 @@ dim_statement: ID DIM dim_declaration
 goto_statement: ID GOTO GOTOID {printf("GOTOO\n");}
               ;
 
-gosub_statement: ID GOSUB GOSUBID {printf("GOSUBB\n");}
+gosub_statement: ID GOSUB GOSUBID statement_list return_statement {printf("GOSUBB\n");}
+                | ID GOSUB GOSUBID return_statement {printf("GOSUBB without statements\n");}
                ;
 
 if_statement: ID IF if_declaration THEN IFNUM
@@ -94,19 +100,24 @@ stop_statement: ID STOP {printf("STOPP\n");}
 return_statement: ID RETURN {printf("RETURNN\n");}
                  ;
 
-end_statement: END {printf("ENDD\n");return 0;}
+end_statement: ID END {printf("ENDD\n");}
 
-declaration: expr'='expr
-            | expr'<''='expr
-            | expr'>''='expr
-            | expr'<'expr
-            | expr'>'expr
-            | expr'<''>'expr
-            | expr
+declaration: expr'='expr 
+            | expr'<''='expr 
+            | expr'>''='expr 
+            | expr'<'expr 
+            | expr'>'expr 
+            | expr'<''>'expr 
+            | expr 
             ;
 
 expr: VAR {printf("Variable\n");}
     | NUM {printf("Number\n");}
+    
+    | NOT expr {printf("NOT\n");}
+    | expr AND expr {printf("AND\n");}
+    | expr OR expr {printf("OR\n");}
+    | expr XOR expr {printf("XOR\n");}
 
     | expr '+' expr {printf("Addition\n");}
     | expr '-' expr {printf("Subtraction\n");}
@@ -138,6 +149,11 @@ if_expr: IFVAR {printf("Variable\n");}
          | '(' if_expr ')' {printf("Parenthesis\n");}
          | '[' if_expr ']' {printf("Brackets\n");}
          | '{' if_expr '}' {printf("Braces\n");}
+
+         | NOT if_expr {printf("NOT\n");}
+         | if_expr AND if_expr {printf("AND\n");}
+         | if_expr OR if_expr {printf("OR\n");}
+         | if_expr XOR if_expr {printf("XOR\n");}
          ;
 
 input_declaration: input_expr
@@ -167,6 +183,16 @@ def_declaration: FN '=' expr
             | FN '(' VAR ')' '=' expr 
 
 
+print_declaration: print_expr
+                  | print_declaration ';' 
+                  | print_declaration ',' print_expr
+                  | print_declaration ';' print_expr
+                  ;
+
+print_expr: declaration
+            | STRING {printf("String\n");}
+          ;
+
 %%
 
 void yyerror(const char *msg) {
@@ -174,6 +200,8 @@ void yyerror(const char *msg) {
 }
 
 int main() {
+    yyin = fopen("./test.bmm", "r");
     yyparse();
+    fclose(yyin);
     return 0;
 }
